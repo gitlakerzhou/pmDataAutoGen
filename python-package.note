@@ -1,0 +1,69 @@
+[overture@TAC-ENC01 pycrypto-2.6.1]$ 
+sudo yum install python-devel
+download pycrypto
+unzip
+cd dir
+sudo python setup.py build
+sudo python setup.py install
+
+
+sudo yum install sqlite-devel zlib-devel openssl-devel readline-devel
+
+wget --no-check-certificate https://pypi.python.org/packages/source/s/setuptools/setuptools-1.4.2.tar.gz
+tar -xvf setuptools-1.4.2.tar.gz
+cd setuptools-1.4.2
+python setup.py install
+
+download EXscript
+python setup.py install
+curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
+python get-pip.py
+pip -V
+sudo pip install --upgrade ./pycrypto-2.6.1
+
+
+
+++++resolve multiple pycryto version issue+++
+yum install gmp-devel
+sudo pip uninstall ecdsa pycrypto paramiko fabric 
+# clear out the pip build dirs
+rm -rf /tmp/pip-*
+# make sure the directory containing libgmp.so.3 is on the python path
+export LD_LIBRARY_PATH="/usr/lib64:$LD_LIBRARY_PATH"  
+pip install fabric 
+==============================
+
+install py_pexpect =======================
+pkgadd -d http://get.opencsw.org/now
+/opt/csw/bin/pkgutil -U
+/opt/csw/bin/pkgutil -y -i py_pexpect 
+/opt/csw/bin/pkgutil -y -i libreadline6
+/usr/sbin/pkgchk -L CSWpy-pexpect # list files
+
+
+grep ucb/cc /var/sadm/install/contents
+ln -s /opt/SUNWspro/bin/acc /usr/ccs/bin/ucbcc
+grep ucbcc /var/sadm/install/contents
+
+
+http://stackoverflow.com/questions/1396678/how-to-install-64-bit-python-on-solaris
+
+45  /opt/csw/bin/pkgutil -U
+   46  /opt/csw/bin/pkgutil -y -i py_paramiko
+   47  cd /opt/csw/bin/
+   48  ./pip-2.7 install exscript
+
+
+/opt/csw/bin/python2.7 /exscript/hive.py
+import pxssh
+s = pxssh.pxssh()
+if not s.login ('192.168.51.160', 'admin', 'admin', auto_prompt_reset=False):
+    print "SSH session failed on login."
+    print str(s)
+else:
+    print "SSH session login successful"
+    s.sendline ('ls -l')
+    s.prompt()         # match the prompt
+    print s.before     # print everything before the prompt.
+    s.logout()
+
