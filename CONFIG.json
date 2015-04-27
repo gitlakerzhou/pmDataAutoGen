@@ -1,0 +1,4 @@
+{
+    "rootDir" : "/var/log/AutoCfmTestReport",
+    "log" : "disable"
+}

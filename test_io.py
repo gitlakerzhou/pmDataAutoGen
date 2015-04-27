@@ -35,12 +35,12 @@ class TestIO(object):
             print('creating rootDir' + self.rootDir)
             os.makedirs(self.rootDir)
         #check host file
-        if not os.path.exists(self.rootDir + "\\hosts"):
+        if not os.path.exists(self.rootDir + "/hosts"):
             print('Cannot find the hosts file, terminating')
             exit(1)
 
         #check account file
-        if not os.path.exists(self.rootDir +"\\accounts"):
+        if not os.path.exists(self.rootDir +"/accounts"):
             print('Cannot find the accounts file, terminating')
             exit(1)
 
@@ -48,13 +48,13 @@ class TestIO(object):
 
     def reportFiles(self, ip, cpe):
         files = {}
-        if not os.path.exists(self.rootDir +'\\' + ip):
+        if not os.path.exists(self.rootDir +'/' + ip):
             print('creating rootDir' + self.rootDir)
-            os.makedirs(self.rootDir +'\\' + ip)
-        if not os.path.exists(self.rootDir +'\\' + ip + '\\' + cpe):
-            os.makedirs(self.rootDir +'\\' + ip + '\\' + cpe)
-        files["latest"] = open(self.rootDir +'\\' + ip + '\\' + cpe + '\\reprot', 'w+')
-        files["daily"]  = open(self.rootDir +'\\' + ip + '\\' + cpe + '\\reprot_' + self.dateStr(), 'a+')
+            os.makedirs(self.rootDir +'/' + ip)
+        if not os.path.exists(self.rootDir +'/' + ip + '/' + cpe):
+            os.makedirs(self.rootDir +'/' + ip + '/' + cpe)
+        files["latest"] = open(self.rootDir +'/' + ip + '/' + cpe + '/reprot', 'w+')
+        files["daily"]  = open(self.rootDir +'/' + ip + '/' + cpe + '/reprot_' + self.dateStr(), 'a+')
         return files
 
     def createReports(self, **testMetrics):
@@ -355,12 +355,12 @@ class TestIO(object):
             if (keyStr == 'priority'):
                 self.get_test_detail_priority(line)
 
-
+"""
 t = TestIO()
 t.readConfig()
 t.checkEnvironment()
 
-lines = open("response").readlines()
+lines = open("exampleResp").readlines()
 t.handleShowStatsCfmSlaTest(lines)
 #print(t.metrics_entry)
 myhost = {'ip':"1.1.2.1", 'type':4000, 'cpe': 1001}
@@ -368,3 +368,4 @@ metricsHost = t.metrics_entry.copy()
 metricsHost.update(myhost)
 t.createReports(**metricsHost)
 t.getTestInstance('')
+"""
