@@ -8,17 +8,19 @@ from Exscript            import Host
 from Exscript.util.file  import get_hosts_from_file, get_accounts_from_file
 from Exscript.util.start import start
 import test_io
+import logging
 
 class Sessions(object):
 	def __init__(self, rootDir):
-		#self.rootDir = '/var/log/AutoCfmTestReport/'
-		self.hosts = get_hosts_from_file(rootDir + "hosts")
-		self.accounts = get_accounts_from_file(rootDir + "accounts")
+		self.hosts = get_hosts_from_file(rootDir + "/" + "hosts")
+		logging.info("read in hosts"+rootDir + "/" + "hosts")
+		self.accounts = get_accounts_from_file(rootDir + "/" + "accounts")
 
 	def command_loop(self, job, host, conn):
 		conn.autoinit()
 		conn.execute('show config run')
-		print conn.response
+		resp = conn.response
+		logging.info(resp)
 
 		conn.send('logout force')
 		conn.close()

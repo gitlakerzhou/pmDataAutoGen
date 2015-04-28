@@ -3,6 +3,9 @@ import errno
 import datetime
 import json
 import re
+import logging
+
+
 
 class TestIO(object):
 
@@ -21,10 +24,11 @@ class TestIO(object):
         return str(dt.day) + '_' + str(dt.hour) + '_' + str(dt.minute)
 
     def readConfig(self):
+        path = os.path.dirname(os.path.realpath(__file__))
         try:
-            data = json.loads(open("CONFIG.json").read())
+            data = json.loads(open(path + "/" +"CONFIG.json").read())
         except:
-            print('No CONIFG file is found, exiting')
+            logging.info('No CONIFG file is found, exiting')
             exit(1)
         self.rootDir = data["rootDir"]
         if data["log"] == "enable":
@@ -32,16 +36,16 @@ class TestIO(object):
 
     def checkEnvironment(self):
         if not os.path.exists(self.rootDir):
-            print('creating rootDir' + self.rootDir)
+            logging.info('creating rootDir' + self.rootDir)
             os.makedirs(self.rootDir)
         #check host file
         if not os.path.exists(self.rootDir + "/hosts"):
-            print('Cannot find the hosts file, terminating')
+            logging.info('Cannot find the hosts file, terminating')
             exit(1)
 
         #check account file
         if not os.path.exists(self.rootDir +"/accounts"):
-            print('Cannot find the accounts file, terminating')
+            logging.info('Cannot find the accounts file, terminating')
             exit(1)
 
         print("checking Environment completed")
