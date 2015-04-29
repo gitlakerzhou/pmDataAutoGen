@@ -156,11 +156,12 @@ class MyDaemon(Daemon):
         logging.info("Check env")
         t.checkEnvironment()
 
+
         logging.info("Ready for the main loop")
+        testSession = session.Sessions(t.rootDir)
 
         #main loop:
         while True:
-            testSession = session.Sessions(t.rootDir)
             testSession.parallelExec()
             #delay 15 minutes
             logging.info("looping")
