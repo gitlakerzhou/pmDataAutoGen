@@ -326,3 +326,48 @@ def handleShowBondingList(lines):
             if m:
                 bondings.append(m.group(1))
         return bondings
+
+def handleShowStatsPolicerAll(lines):
+        """
+        CPE Policer statistics:
+        
+        Instance  age                     cirPass     pirPass     pirDrop
+        --------  -------------------  ----------  ----------  ----------
+        1001/1    1 days, 02:45:12              0           0           0
+        """
+        policer_stats = {}
+        
+        re1='(\\d+)'	# Integer Number 1
+        re2='(\\/)'	# Any Single Character 1
+        re3='(\\d+)'	# Uninteresting: int
+        re4='.*?'	# Non-greedy match on filler
+        re5='(\\d+)'	# Integer Number 2
+        re6='.*?'	# Non-greedy match on filler
+        re7='(days)'	# Variable Name 1
+        re8='.*?'	# Non-greedy match on filler
+        re9='(\\d+)'	# Integer Number 4
+        re10='(:)'	# Any Single Character 2
+        re11='(\\d+)'	# Integer Number 5
+        re12='(:)'	# Any Single Character 3
+        re13='(\\d+)'	# Integer Number 6
+        re14='.*?'	# Non-greedy match on filler
+        re15='(\\d+)'	# Integer Number 7
+        re16='.*?'	# Non-greedy match on filler
+        re17='(\\d+)'	# Integer Number 8
+        re18='.*?'	# Non-greedy match on filler
+        re19='(\\d+)'	# Integer Number 9       
+        rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11+re12+re13+re14+re15+re16+re17+re18+re19,re.IGNORECASE|re.DOTALL)
+
+        for line in lines:
+            if line:
+                m = rg.search(line)
+                if m:
+                    policer_stats['cpe']=m.group(1)
+                    policer_stats['policerId']=m.group(3)
+
+                    policer_stats['cirPass']=m.group(11)
+                    policer_stats['pirPass']=m.group(12)
+                    policer_stats['pirDrop']=m.group(13)
+        return policer_stats
+       
+        

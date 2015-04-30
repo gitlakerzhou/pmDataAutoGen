@@ -49,15 +49,27 @@ class Sessions(object):
 		
 		bondings = parsing.handleShowBondingList(resp)
 		logging.info(','.join(bondings))
+		
 
 		#for each bonding get test instance list
 		for b in bondings:
+			measurements = {}
 			logging.info('show cfmSlaTest *')
 			conn.execute('cpe ' + str(b) + ' show cfmSlaTest *')
 			time.sleep(2)
 			resp = conn.response.split('\n')
 			instance_ids = parsing.handleShowCfmSlaTestList(resp)
 			logging.info(str(b) + ': ' + ','.join(instance_ids))
+
+			#get bandwidth usages
+			logging.info('show statis policer *')
+			conn.execute('cpe ' + str(b) + ' show statistics policer *')
+			
+			time.sleep(2)
+			resp = conn.response.split('\n')
+			bw = parsing.handleShowStatsPolicerAll(resp)
+			if bw:
+				measurements.update(bw)
 
 			#get detailed measurements
 			for id in instance_ids:
@@ -69,11 +81,11 @@ class Sessions(object):
 				
 				resp = conn.response.split('\n')
 				#logging.info(resp)
-				measurements = parsing.handleShowStatsCfmSlaTest(resp)
+				measurements.update(parsing.handleShowStatsCfmSlaTest(resp))
 				
 				measurements['ip'] = host
 				measurements['type'] = 4000
-				measurements['cpe'] = id
+				measurements['cpe'] = str(b)
 				logging.info(measurements)
 				#test_io.createReports(self.io, measurements)
 				self.io.createReports(**measurements)
