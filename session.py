@@ -9,21 +9,24 @@ from Exscript.util.file  import get_hosts_from_file, get_accounts_from_file
 from Exscript.util.start import start
 import test_io
 import logging
+import parsing
+import time
 
 class Sessions(object):
-	def __init__(self, rootDir):
+	def __init__(self, io):
 		self.hosts = []
 		self.accounts = []
-		self.hosts = get_hosts_from_file(rootDir + "/" + "hosts")
-		logging.info("read in hosts"+rootDir + "/" + "hosts")
+		self.io = io
+		self.hosts = get_hosts_from_file(self.io.rootDir + "/" + "hosts")
+		logging.info("read in hosts" + self.io.rootDir + "/" + "hosts")
 		if not self.hosts:
 			logging.info("EMPTY HOST FILE, exit ...")
 			exit(1)
 		for h in self.hosts:
 			logging.info("host:" + h.get_address())
 
-		self.accounts = get_accounts_from_file(rootDir + "/" + "accounts")
-		logging.info("read in accounts"+rootDir + "/" + "accounts")
+		self.accounts = get_accounts_from_file(io.rootDir + "/" + "accounts")
+		logging.info("read in accounts" + self.io.rootDir + "/" + "accounts")
 		if not self.accounts:
 			logging.info("EMPTY ACCOUNT FILE, exit ...")
 			exit(1)
@@ -34,10 +37,47 @@ class Sessions(object):
 		conn.autoinit()
 		#conn.execute('show config run')
 		host = conn.get_host()
+		logging.info(host)
 		if not conn.is_app_authenticated() or not conn.is_app_authorized():
 			logging.info("authentication failed on " + host)
-		#resp = conn.response
-		#logging.info(resp)
+
+		#get list of CPEs
+		logging.info('show bonding *')
+		conn.execute('show bonding *')
+		time.sleep(2)
+		resp = conn.response.split('\n')
+		
+		bondings = parsing.handleShowBondingList(resp)
+		logging.info(','.join(bondings))
+
+		#for each bonding get test instance list
+		for b in bondings:
+			logging.info('show cfmSlaTest *')
+			conn.execute('cpe ' + str(b) + ' show cfmSlaTest *')
+			time.sleep(2)
+			resp = conn.response.split('\n')
+			instance_ids = parsing.handleShowCfmSlaTestList(resp)
+			logging.info(str(b) + ': ' + ','.join(instance_ids))
+
+			#get detailed measurements
+			for id in instance_ids:
+				logging.info('show cfmSlaTest ID')
+				cmd = 'cpe ' + str(b) + ' show pmstats cfmSlaTest ' + id + ' startInterval current'
+				logging.info(cmd)
+				conn.execute(cmd)
+				time.sleep(2)
+				
+				resp = conn.response.split('\n')
+				#logging.info(resp)
+				measurements = parsing.handleShowStatsCfmSlaTest(resp)
+				
+				measurements['ip'] = host
+				measurements['type'] = 4000
+				measurements['cpe'] = id
+				logging.info(measurements)
+				#test_io.createReports(self.io, measurements)
+				self.io.createReports(**measurements)
+				#logging.info(self.io.rootDir)
 
 		conn.send('logout force')
 		conn.close()
@@ -45,7 +85,4 @@ class Sessions(object):
 	def parallelExec(self):
 		start(self.accounts, self.hosts, self.command_loop, max_threads = 5)
 
-"""
-test = Sessions('/var/log/AutoCfmTestReport/')
-test.parallelExec()
-"""
+

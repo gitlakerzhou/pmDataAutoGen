@@ -150,15 +150,15 @@ class MyDaemon(Daemon):
 
         #import the configurations
         logging.info("Create TestIO instance") 
-        t = test_io.TestIO()
+        io = test_io.TestIO()
         logging.info("Read Config")
-        t.readConfig()
+        io.readConfig()
         logging.info("Check env")
-        t.checkEnvironment()
+        io.checkEnvironment()
 
 
         logging.info("Ready for the main loop")
-        testSession = session.Sessions(t.rootDir)
+        testSession = session.Sessions(io)
 
         #main loop:
         while True:
@@ -166,16 +166,6 @@ class MyDaemon(Daemon):
             #delay 15 minutes
             logging.info("looping")
             time.sleep(9) 
-"""
-lines = open("exampleResp").readlines()
-t.handleShowStatsCfmSlaTest(lines)
-#print(t.metrics_entry)
-myhost = {'ip':"1.1.2.1", 'type':4000, 'cpe': 1001}
-metricsHost = t.metrics_entry.copy()
-metricsHost.update(myhost)
-t.createReports(**metricsHost)
-t.getTestInstance('')
-"""
 
 if __name__ == "__main__":
     daemon = MyDaemon('/tmp/daemon-pid.pid')

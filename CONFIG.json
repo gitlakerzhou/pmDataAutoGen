@@ -1,4 +1,10 @@
 {
     "rootDir" : "/var/log/AutoCfmTestReport",
-    "log" : "disable"
+    "log" : "disable",
+    "output": [
+		"testNum",
+		"avail",
+		"pktNum",
+		"pktFail"
+		]
 }
