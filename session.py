@@ -56,7 +56,6 @@ class Sessions(object):
 			measurements = {}
 			logging.info('show cfmSlaTest *')
 			conn.execute('cpe ' + str(b) + ' show cfmSlaTest *')
-			time.sleep(2)
 			resp = conn.response.split('\n')
 			instance_ids = parsing.handleShowCfmSlaTestList(resp)
 			logging.info(str(b) + ': ' + ','.join(instance_ids))
@@ -65,7 +64,6 @@ class Sessions(object):
 			logging.info('show statis policer *')
 			conn.execute('cpe ' + str(b) + ' show statistics policer *')
 			
-			time.sleep(2)
 			resp = conn.response.split('\n')
 			bw = parsing.handleShowStatsPolicerAll(resp)
 			if bw:
@@ -73,11 +71,19 @@ class Sessions(object):
 
 			#get detailed measurements
 			for id in instance_ids:
-				logging.info('show cfmSlaTest ID')
+                                logging.info('show cfmSlaTest ID')
+				cmd = 'cpe ' + str(b) + ' show cfmSlaTest ' + id 
+				logging.info(cmd)
+				conn.execute(cmd)
+				
+				resp = conn.response.split('\n')
+				#logging.info(resp)
+				measurements.update(parsing.get_test_instance_detail(resp))
+				
+				logging.info('show pmstats cfmSlaTest ID')
 				cmd = 'cpe ' + str(b) + ' show pmstats cfmSlaTest ' + id + ' startInterval current'
 				logging.info(cmd)
 				conn.execute(cmd)
-				time.sleep(2)
 				
 				resp = conn.response.split('\n')
 				#logging.info(resp)

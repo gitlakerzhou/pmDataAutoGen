@@ -155,8 +155,8 @@ def handleShowStatsCfmSlaTest(lines):
         negJitMin         Negative jitter minimum  (SD/DS)                   0/        0
         negJitMax         Negative jitter maximum  (SD/DS)                   0/        0
         """
-        global metrics_entry
-        metrics_entry = {}
+        #global metrics_entry
+        #metrics_entry = {}
         for line in lines:
             getMetric(line)
             #logging.info(metrics_entry)
@@ -231,31 +231,87 @@ def handleShowCfmSlaTestList(lines):
         return ids
 
     #def get_test_detail_admin(txt):
-    #def get_test_detail_mepId(txt):
+def get_test_detail_mepId(txt):
+        #txt='mepId             MEP ID                                    1 (MEP1001)'
+
+        re1='(mepId)'	# Word 1
+        re2='(\\s+)'	# White Space 1
+        re3='(MEP)'	# Word 2
+        re4='( )'	# Any Single Character 1
+        re5='(ID)'	# US State 1
+        re6='.*?'	# Non-greedy match on filler
+        re7='(\\d+)'	# Integer Number 1
+        re8='( )'	# Any Single Character 2
+        re9='(\\()'	# Any Single Character 3
+        re10='((?:[a-z][a-z0-9_]*))'	# Variable Name 1
+        re11='(\\))'	# Any Single Character 4
+
+        rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11,re.IGNORECASE|re.DOTALL)
+        m = rg.search(txt)
+        if m:
+            key=m.group(1)
+            ws1=m.group(2)
+            word2=m.group(3)
+            c1=m.group(4)
+            usstate1=m.group(5)
+            int1=m.group(6)
+            c2=m.group(7)
+            c3=m.group(8)
+            mepId=m.group(9)
+            c4=m.group(10)
+            metrics_entry[k] = mepId
+            
+
     #def get_test_detail_oper(txt):
     #def get_test_detail_destMac(txt):
-    #def get_test_detail_destMepName(txt):
+def get_test_detail_destMepName(txt):
+        #txt='destMepName       Destination MEP name                      na'
+
+        re1='(destMepName)'	# Word 1
+        re2='(\\s+)'	# White Space 1
+        re3='(Destination)'	# Word 2
+        re4='( )'	# Any Single Character 1
+        re5='(MEP)'	# Word 3
+        re6='( )'	# Any Single Character 2
+        re7='(name)'	# Word 4
+        re8='(\\s+)'	# White Space 2
+        re9='((?:[a-z][a-z0-9_]*))'	# Variable Name 1
+
+        rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9,re.IGNORECASE|re.DOTALL)
+        m = rg.search(txt)
+        if m:
+            word1=m.group(1)
+            ws1=m.group(2)
+            word2=m.group(3)
+            c1=m.group(4)
+            word3=m.group(5)
+            c2=m.group(6)
+            word4=m.group(7)
+            ws2=m.group(8)
+            destMepName=m.group(9)
+            metrics_entry[word1] = destMepName
+
 def get_test_detail_destMepTag(txt):
         (k,v) = regParseLineHeadKeyIntValue(txt)
-        test_instance[k] = v
+        metrics_entry[k] = v
 def get_test_detail_testFreq(txt):
         (k,v) = regParseLineHeadKeyIntValue(txt)
-        test_instance[k] = v
+        metrics_entry[k] = v
 def get_test_detail_iter(txt):
         (k,v) = regParseLineHeadKeyIntValue(txt)
-        test_instance[k] = v
+        metrics_entry[k] = v
 def get_test_detail_size(txt):
         (k,v) = regParseLineHeadKeyIntValue(txt)
-        test_instance[k] = v
+        metrics_entry[k] = v
 def get_test_detail_freq(txt):
         (k,v) = regParseLineHeadKeyIntValue(txt)
-        test_instance[k] = v
+        metrics_entry[k] = v
 def get_test_detail_timeout(txt):
         (k,v) = regParseLineHeadKeyIntValue(txt)
-        test_instance[k] = v
+        metrics_entry[k] = v
 def get_test_detail_priority(txt):
         (k,v) = regParseLineHeadKeyIntValue(txt)
-        test_instance[k] = v
+        metrics_entry[k] = v
 
 def get_test_instance_detail(lines):
         """
@@ -275,19 +331,27 @@ def get_test_instance_detail(lines):
         timeout           Packet timeout in msec                    5000
         priority          VLAN priority                             1
         """
-        test_instance = {}
+        global metrics_entry
+        metrics_entry = {}
+        keyStr = ''
         for line in lines:
-            keyStr = str(line).split(' ')[0]
-            """if (keyStr == "admin"):
+            words = str(line).split(' ')
+            """if (keyStr[0] == "admin"):
                 get_test_detail_admin(line)
+            
+            if (keyStr[0] == 'oper'):
+                get_test_detail_oper(line)
+            if (keyStr[0] == 'destMac'):
+                get_test_detail_destMac(line)
+            """
+            if (words):
+                keyStr = words[0]
+            else:
+                continue
             if (keyStr == "mepId"):
                 get_test_detail_mepId(line)
-            if (keyStr == 'oper'):
-                get_test_detail_oper(line)
-            if (keyStr == 'destMac'):
-                get_test_detail_destMac(line)
             if (keyStr == 'destMepName'):
-                get_test_detail_destMepName(line)"""
+                get_test_detail_destMepName(line)
             if (keyStr == 'destMepTag'):
                 get_test_detail_destMepTag(line)
             if (keyStr == "testFreq"):
@@ -302,6 +366,7 @@ def get_test_instance_detail(lines):
                 get_test_detail_timeout(line)
             if (keyStr == 'priority'):
                 get_test_detail_priority(line)
+        return metrics_entry
 
 
 def handleShowBondingList(lines):
