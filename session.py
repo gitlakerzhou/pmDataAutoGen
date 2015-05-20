@@ -54,6 +54,8 @@ class Sessions(object):
 		#for each bonding get test instance list
 		for b in bondings:
 			measurements = {}
+			bwm = {}
+			pm = {}
 			logging.info('show cfmSlaTest *')
 			conn.execute('cpe ' + str(b) + ' show cfmSlaTest *')
 			resp = conn.response.split('\n')
@@ -65,9 +67,12 @@ class Sessions(object):
 			conn.execute('cpe ' + str(b) + ' show statistics policer *')
 			
 			resp = conn.response.split('\n')
-			bw = parsing.handleShowStatsPolicerAll(resp)
-			if bw:
-				measurements.update(bw)
+			bwm = parsing.handleShowStatsPolicerAll(resp)
+			logging.info(bwm)
+			conn.execute('cpe ' + str(b) + ' show policerMapping *')
+			resp = conn.response.split('\n')
+			pm = parsing.handleShowPolicerMappingAll(resp)
+			logging.info(pm)
 
 			#get detailed measurements
 			for id in instance_ids:
@@ -79,7 +84,7 @@ class Sessions(object):
 				resp = conn.response.split('\n')
 				#logging.info(resp)
 				measurements.update(parsing.get_test_instance_detail(resp))
-				
+				logging.info(measurements)
 				logging.info('show pmstats cfmSlaTest ID')
 				cmd = 'cpe ' + str(b) + ' show pmstats cfmSlaTest ' + id + ' startInterval current'
 				logging.info(cmd)

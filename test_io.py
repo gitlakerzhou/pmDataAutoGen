@@ -33,7 +33,7 @@ class TestIO(object):
         self.rootDir = data["rootDir"]
         if data["log"] == "enable":
             self.logEnable = True
-        for e in data["output"]:
+        for e in data["CFM output"]:
             self.output_list.append(e)
         logging.info("output format: " + ','.join(self.output_list))
 		
@@ -61,7 +61,7 @@ class TestIO(object):
             os.makedirs(self.rootDir +'/' + ip)
         if not os.path.exists(self.rootDir +'/' + ip + '/' + cpe):
             os.makedirs(self.rootDir +'/' + ip + '/' + cpe)
-        files["latest"] = open(self.rootDir +'/' + ip + '/' + cpe + '/reprot', 'w+')
+        files["latest"] = open(self.rootDir +'/' + ip + '/' + cpe + '/cfmreprot', 'w+')
         files["daily"]  = open(self.rootDir +'/' + ip + '/' + cpe + '/reprot_' + self.dateStr(), 'a+')
         return files
 

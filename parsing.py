@@ -1,5 +1,7 @@
+from __future__ import division
 import re
 import logging
+import math
 
 metrics_entry = {}
 
@@ -44,7 +46,9 @@ def regParseLineHeadKeyIntValue(txt):
             int1=m.group(2)
             #print "("+var1+")"+"("+int1+")"+"\n"
             return (var1, int1)
-        return ('unknown',0)
+        else:
+            logging.info("No match found" + txt)        
+            return ('unknown',0)
 
 def get_testNum(txt):
         re1='(testNum)'	# Word 1
@@ -67,8 +71,20 @@ def get_pktStats(txt):
 def get_rttStats(txt):
         (k,v) = regParseLineHeadKeyIntValue(txt)
         metrics_entry[k] = v
-
-
+        v2 = int(math.ceil(int(v)/2))
+        # calculate 1way delay
+        if k == 'rttSum':
+                metrics_entry['1waySum'] = v2
+        if k == 'rttSum2':
+                metrics_entry['1waySum2'] = v2
+        if k == 'rttMin':
+                metrics_entry['1wayMin'] = v2                
+        if k == 'rttMax':
+                metrics_entry['1wayMax'] = v2
+        if k == 'rttAvg':
+                metrics_entry['1wayAvg'] = v2
+        #logging.info(metrics_entry)
+                
 def get_jitStats(txt):
         re1='((?:[a-z][a-z0-9_]*))'	# Variable Name 1
         re2='.*?'	# Non-greedy match on filler
@@ -103,7 +119,7 @@ def getMetric(line):
         if (keyStr.startswith('pkt')):
             get_pktStats(line)
         if (keyStr.startswith('rtt')):
-            get_pktStats(line)
+            get_rttStats(line)
         if (keyStr.startswith('posJit') or
             keyStr.startswith('negJit') or
             keyStr.startswith('interArrJit') or
@@ -207,6 +223,8 @@ def getTestInstance(txt):
             logging.info ("("+cpeId+")"+"("+testId+")"+"("+testName +")"+"("+mepId+")"+"("+mepName+")"+"("+oper+")"+"("+destId+")")
             if (oper == 'acti'):
                 return testId
+        else:
+            logging.info("No match found" + txt)
 
 
 def handleShowCfmSlaTestList(lines):
@@ -235,31 +253,32 @@ def get_test_detail_mepId(txt):
         #txt='mepId             MEP ID                                    1 (MEP1001)'
 
         re1='(mepId)'	# Word 1
-        re2='(\\s+)'	# White Space 1
+        re2='.*?'	# Non-greedy match on filler
         re3='(MEP)'	# Word 2
-        re4='( )'	# Any Single Character 1
+        re4='( )'	# White Space 1
         re5='(ID)'	# US State 1
         re6='.*?'	# Non-greedy match on filler
         re7='(\\d+)'	# Integer Number 1
-        re8='( )'	# Any Single Character 2
-        re9='(\\()'	# Any Single Character 3
-        re10='((?:[a-z][a-z0-9_]*))'	# Variable Name 1
-        re11='(\\))'	# Any Single Character 4
+        re8='.*?'	# Non-greedy match on filler
+        re9='(\\()'	# Any Single Character 1
+        re10='((?:[A-Za-z0-9_]*))'	# Variable Name 1
+        re11='(\\))'	# Any Single Character 2
 
         rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11,re.IGNORECASE|re.DOTALL)
         m = rg.search(txt)
         if m:
-            key=m.group(1)
-            ws1=m.group(2)
-            word2=m.group(3)
-            c1=m.group(4)
-            usstate1=m.group(5)
-            int1=m.group(6)
-            c2=m.group(7)
-            c3=m.group(8)
-            mepId=m.group(9)
-            c4=m.group(10)
-            metrics_entry[k] = mepId
+            word1=m.group(1)
+            word2=m.group(2)
+            ws1=m.group(3)
+            usstate1=m.group(4)
+            int1=m.group(5)
+            c1=m.group(6)
+            var1=m.group(7)
+            c2=m.group(8)
+            
+            metrics_entry[word1] = var1
+        else:
+            logging.info("No match found" + txt)
             
 
     #def get_test_detail_oper(txt):
@@ -275,7 +294,7 @@ def get_test_detail_destMepName(txt):
         re6='( )'	# Any Single Character 2
         re7='(name)'	# Word 4
         re8='(\\s+)'	# White Space 2
-        re9='((?:[a-z][a-z0-9_]*))'	# Variable Name 1
+        re9='((?:[A-Za-z0-9_]*))'	# Variable Name 1
 
         rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9,re.IGNORECASE|re.DOTALL)
         m = rg.search(txt)
@@ -290,10 +309,12 @@ def get_test_detail_destMepName(txt):
             ws2=m.group(8)
             destMepName=m.group(9)
             metrics_entry[word1] = destMepName
-
-def get_test_detail_destMepTag(txt):
-        (k,v) = regParseLineHeadKeyIntValue(txt)
-        metrics_entry[k] = v
+        else:
+            logging.info("No match found" + txt)
+            
+#def get_test_detail_destMepTag(txt):
+#        (k,v) = regParseLineHeadKeyIntValue(txt)
+#        metrics_entry[k] = v
 def get_test_detail_testFreq(txt):
         (k,v) = regParseLineHeadKeyIntValue(txt)
         metrics_entry[k] = v
@@ -348,12 +369,13 @@ def get_test_instance_detail(lines):
                 keyStr = words[0]
             else:
                 continue
+            #logging.info(line)
             if (keyStr == "mepId"):
                 get_test_detail_mepId(line)
             if (keyStr == 'destMepName'):
                 get_test_detail_destMepName(line)
-            if (keyStr == 'destMepTag'):
-                get_test_detail_destMepTag(line)
+            #if (keyStr == 'destMepTag'):
+            #    get_test_detail_destMepTag(line)
             if (keyStr == "testFreq"):
                 get_test_detail_testFreq(line)
             if (keyStr == "iter"):
@@ -401,6 +423,7 @@ def handleShowStatsPolicerAll(lines):
         1001/1    1 days, 02:45:12              0           0           0
         """
         policer_stats = {}
+        ps_item = {}
         
         re1='(\\d+)'	# Integer Number 1
         re2='(\\/)'	# Any Single Character 1
@@ -427,12 +450,48 @@ def handleShowStatsPolicerAll(lines):
             if line:
                 m = rg.search(line)
                 if m:
-                    policer_stats['cpe']=m.group(1)
-                    policer_stats['policerId']=m.group(3)
+                    policerId = m.group(3)
 
-                    policer_stats['cirPass']=m.group(11)
-                    policer_stats['pirPass']=m.group(12)
-                    policer_stats['pirDrop']=m.group(13)
+                    ps_item['cirPass']=m.group(11)
+                    ps_item['pirPass']=m.group(12)
+                    ps_item['pirDrop']=m.group(13)
+                    policer_stats[policerId] = ps_item;
         return policer_stats
        
-        
+def handleShowPolicerMappingAll(lines):
+        """
+        CPE Policer mapping parameters:
+
+        cpe   uniId              evcId              policerId                cosMap
+        ----  -----------------  -----------------  -----------------------  -----------
+        1002  1001               1 (evc1)           1 (policer1)             all
+
+        """
+        policerMapping = {}
+        re1='(\\d+)'	# Integer Number 1
+        re2='.*?'	# Non-greedy match on filler
+        re3='(\\d+)'	# Integer Number 2
+        re4='.*?'	# Non-greedy match on filler
+        re5='(\\d+)'	# Integer Number 3
+        re6='( )'	# White Space 1
+        re7='(\\()'	# Any Single Character 1
+        re8='((?:[A-Za-z0-9_]*))'	# Variable Name 1
+        re9='(\\))'	# Any Single Character 2
+        re10='.*?'	# Non-greedy match on filler
+        re11='(\\d+)'	# Integer Number 4
+
+        rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11,re.IGNORECASE|re.DOTALL)
+        for txt in lines:
+                if txt:
+                        m = rg.search(txt)
+                        if m:
+                            int1=m.group(1)
+                            uni=m.group(2)
+                            evc=m.group(3)
+                            ws1=m.group(4)
+                            c1=m.group(5)
+                            var1=m.group(6)
+                            c2=m.group(7)
+                            policerId=m.group(8)
+                            policerMapping[policerId] = (uni,evc)
+                            return policerMapping
