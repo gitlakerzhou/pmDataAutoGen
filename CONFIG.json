@@ -10,7 +10,7 @@
 		"rttSum","rttSum2","rttMin","rttMax","rttAvg",
 		"1waySum","1waySum2","1wayMin","1wayMax","1wayAvg",
 		"interArrJitSD","interArrJitDS","peakToPeakJitSD","peakToPeakJitDS"
-		]
+		],
     "BW output": [
 		"UNI","EVC","pirDrop","cirPass","pirPass"
 		]

@@ -6,25 +6,25 @@ import math
 metrics_entry = {}
 
 def get_time(line):
-        re1='(time)'	# Word 1
-        re2='.*?'	# Non-greedy match on filler
-        re3='((?:[0]?[1-9]|[1][012])[-:\\/.](?:(?:[0-2]?\\d{1})|(?:[3][01]{1}))[-:\\/.](?:(?:[1]{1}\\d{1}\\d{1}\\d{1})|(?:[2]{1}\\d{3})))(?![\\d])'	# MMDDYYYY 1
-        re4='.*?'	# Non-greedy match on filler
-        re5='((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])(?::[0-5][0-9])?(?:\\s?(?:am|AM|pm|PM))?)'	# HourMinuteSec 1
+    re1='(time)'    # Word 1
+    re2='.*?'   # Non-greedy match on filler
+    re3='((?:[0]?[1-9]|[1][012])[-:\\/.](?:(?:[0-2]?\\d{1})|(?:[3][01]{1}))[-:\\/.](?:(?:[1]{1}\\d{1}\\d{1}\\d{1})|(?:[2]{1}\\d{3})))(?![\\d])' # MMDDYYYY 1
+    re4='.*?'   # Non-greedy match on filler
+    re5='((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])(?::[0-5][0-9])?(?:\\s?(?:am|AM|pm|PM))?)'    # HourMinuteSec 1
 
-        rg = re.compile(re1+re2+re3+re4+re5,re.IGNORECASE|re.DOTALL)
-        m = rg.search(line)
-        if m:
-            word1=m.group(1)
-            mmddyyyy1=m.group(2)
-            time1=m.group(3)
-            #print "("+word1+")"+"("+mmddyyyy1+")"+"("+time1+")"+"\n"
-            metrics_entry[word1] = time1
+    rg = re.compile(re1+re2+re3+re4+re5,re.IGNORECASE|re.DOTALL)
+    m = rg.search(line)
+    if m:
+        word1=m.group(1)
+        mmddyyyy1=m.group(2)
+        time1=m.group(3)
+        #print "("+word1+")"+"("+mmddyyyy1+")"+"("+time1+")"+"\n"
+        metrics_entry[word1] = time1
 
 def get_avail(line):
-        re1='(avail)'	# Word 1
-        re2='.*?'	# Non-greedy match on filler
-        re3='([+-]?\\d*\\.\\d+)(?![-+0-9\\.])'	# Float 1
+        re1='(avail)'   # Word 1
+        re2='.*?'   # Non-greedy match on filler
+        re3='([+-]?\\d*\\.\\d+)(?![-+0-9\\.])'  # Float 1
 
         rg = re.compile(re1+re2+re3,re.IGNORECASE|re.DOTALL)
         m = rg.search(line)
@@ -35,9 +35,9 @@ def get_avail(line):
             metrics_entry[word1] = str(float1)+'%'
 
 def regParseLineHeadKeyIntValue(txt):
-        re1='((?:[a-z][a-z0-9_]*))'	# Variable Name 1
-        re2='.*?'	# Non-greedy match on filler
-        re3='(\\d+)'	# Integer Number 1
+        re1='((?:[a-z][a-z0-9_]*))' # Variable Name 1
+        re2='.*?'   # Non-greedy match on filler
+        re3='(\\d+)'    # Integer Number 1
 
         rg = re.compile(re1+re2+re3,re.IGNORECASE|re.DOTALL)
         m = rg.search(txt)
@@ -51,9 +51,9 @@ def regParseLineHeadKeyIntValue(txt):
             return ('unknown',0)
 
 def get_testNum(txt):
-        re1='(testNum)'	# Word 1
-        re2='.*?'	# Non-greedy match on filler
-        re3='(\\d+)'	# Integer Number 1
+        re1='(testNum)' # Word 1
+        re2='.*?'   # Non-greedy match on filler
+        re3='(\\d+)'    # Integer Number 1
 
         rg = re.compile(re1+re2+re3,re.IGNORECASE|re.DOTALL)
         m = rg.search(txt)
@@ -74,24 +74,24 @@ def get_rttStats(txt):
         v2 = int(math.ceil(int(v)/2))
         # calculate 1way delay
         if k == 'rttSum':
-                metrics_entry['1waySum'] = v2
+            metrics_entry['1waySum'] = v2
         if k == 'rttSum2':
-                metrics_entry['1waySum2'] = v2
+            metrics_entry['1waySum2'] = v2
         if k == 'rttMin':
-                metrics_entry['1wayMin'] = v2                
+            metrics_entry['1wayMin'] = v2                
         if k == 'rttMax':
-                metrics_entry['1wayMax'] = v2
+            metrics_entry['1wayMax'] = v2
         if k == 'rttAvg':
-                metrics_entry['1wayAvg'] = v2
+            metrics_entry['1wayAvg'] = v2
         #logging.info(metrics_entry)
                 
 def get_jitStats(txt):
-        re1='((?:[a-z][a-z0-9_]*))'	# Variable Name 1
-        re2='.*?'	# Non-greedy match on filler
-        re3='(\\d+)'	# Integer Number 1
-        re4='(\\/)'	# Any Single Character 1
-        re5='.*?'	# Non-greedy match on filler
-        re6='(\\d+)'	# Integer Number 2
+        re1='((?:[a-z][a-z0-9_]*))' # Variable Name 1
+        re2='.*?'   # Non-greedy match on filler
+        re3='(\\d+)'    # Integer Number 1
+        re4='(\\/)' # Any Single Character 1
+        re5='.*?'   # Non-greedy match on filler
+        re6='(\\d+)'    # Integer Number 2
 
         rg = re.compile(re1+re2+re3+re4+re5+re6,re.IGNORECASE|re.DOTALL)
         m = rg.search(txt)
@@ -179,31 +179,31 @@ def handleShowStatsCfmSlaTest(lines):
         return metrics_entry
 
 def getTestInstance(txt):
-        re1='(\\d+)'	# Integer Number 1
-        re2='(\\/)'	# Any Single Character 1
-        re3='(\\d+)'	# Integer Number 2
-        re4='.*?'	# Non-greedy match on filler
-        re5='(\\()'	# Any Single Character 2 (
-        re6='(.*?)'	# Non-greedy match on filler
-        re7='(\\))'	# Any Single Character 3 )
-        re8='.*?'	# Non-greedy match on filler
-        re9='(\\d+)'	# Integer Number 3
-        re10='.*?'	# Non-greedy match on filler
-        re11='(\\()'	# Any Single Character 4
-        re12='(.*?)'	# Non-greedy match on filler
-        re13='(\\))'	# Any Single Character 5
-        re14='.*?'	# Non-greedy match on filler
-        re15='((?:[a-z][a-z]+))'	# Word 1
-        re16='.*?'	# Non-greedy match on filler
-        re17='\\d+'	# Uninteresting: int
-        re18='.*?'	# Non-greedy match on filler
-        re19='\\d+'	# Uninteresting: int
-        re20='.*?'	# Non-greedy match on filler
-        re21='\\d+'	# Uninteresting: int
-        re22='.*?'	# Non-greedy match on filler
-        re23='\\d+'	# Uninteresting: int
-        re24='.*?'	# Non-greedy match on filler
-        re25='(\\d+)'	# Integer Number 4
+        re1='(\\d+)'    # Integer Number 1
+        re2='(\\/)' # Any Single Character 1
+        re3='(\\d+)'    # Integer Number 2
+        re4='.*?'   # Non-greedy match on filler
+        re5='(\\()' # Any Single Character 2 (
+        re6='(.*?)' # Non-greedy match on filler
+        re7='(\\))' # Any Single Character 3 )
+        re8='.*?'   # Non-greedy match on filler
+        re9='(\\d+)'    # Integer Number 3
+        re10='.*?'  # Non-greedy match on filler
+        re11='(\\()'    # Any Single Character 4
+        re12='(.*?)'    # Non-greedy match on filler
+        re13='(\\))'    # Any Single Character 5
+        re14='.*?'  # Non-greedy match on filler
+        re15='((?:[a-z][a-z]+))'    # Word 1
+        re16='.*?'  # Non-greedy match on filler
+        re17='\\d+' # Uninteresting: int
+        re18='.*?'  # Non-greedy match on filler
+        re19='\\d+' # Uninteresting: int
+        re20='.*?'  # Non-greedy match on filler
+        re21='\\d+' # Uninteresting: int
+        re22='.*?'  # Non-greedy match on filler
+        re23='\\d+' # Uninteresting: int
+        re24='.*?'  # Non-greedy match on filler
+        re25='(\\d+)'   # Integer Number 4
 
         rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11+re12+re13+re14+re15+re16+re17+re18+re19+re20+re21+re22+re23+re24+re25,re.IGNORECASE|re.DOTALL)
         m = rg.search(txt)
@@ -252,17 +252,17 @@ def handleShowCfmSlaTestList(lines):
 def get_test_detail_mepId(txt):
         #txt='mepId             MEP ID                                    1 (MEP1001)'
 
-        re1='(mepId)'	# Word 1
-        re2='.*?'	# Non-greedy match on filler
-        re3='(MEP)'	# Word 2
-        re4='( )'	# White Space 1
-        re5='(ID)'	# US State 1
-        re6='.*?'	# Non-greedy match on filler
-        re7='(\\d+)'	# Integer Number 1
-        re8='.*?'	# Non-greedy match on filler
-        re9='(\\()'	# Any Single Character 1
-        re10='((?:[A-Za-z0-9_]*))'	# Variable Name 1
-        re11='(\\))'	# Any Single Character 2
+        re1='(mepId)'   # Word 1
+        re2='.*?'   # Non-greedy match on filler
+        re3='(MEP)' # Word 2
+        re4='( )'   # White Space 1
+        re5='(ID)'  # US State 1
+        re6='.*?'   # Non-greedy match on filler
+        re7='(\\d+)'    # Integer Number 1
+        re8='.*?'   # Non-greedy match on filler
+        re9='(\\()' # Any Single Character 1
+        re10='((?:[A-Za-z0-9_]*))'  # Variable Name 1
+        re11='(\\))'    # Any Single Character 2
 
         rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11,re.IGNORECASE|re.DOTALL)
         m = rg.search(txt)
@@ -286,15 +286,15 @@ def get_test_detail_mepId(txt):
 def get_test_detail_destMepName(txt):
         #txt='destMepName       Destination MEP name                      na'
 
-        re1='(destMepName)'	# Word 1
-        re2='(\\s+)'	# White Space 1
-        re3='(Destination)'	# Word 2
-        re4='( )'	# Any Single Character 1
-        re5='(MEP)'	# Word 3
-        re6='( )'	# Any Single Character 2
-        re7='(name)'	# Word 4
-        re8='(\\s+)'	# White Space 2
-        re9='((?:[A-Za-z0-9_]*))'	# Variable Name 1
+        re1='(destMepName)' # Word 1
+        re2='(\\s+)'    # White Space 1
+        re3='(Destination)' # Word 2
+        re4='( )'   # Any Single Character 1
+        re5='(MEP)' # Word 3
+        re6='( )'   # Any Single Character 2
+        re7='(name)'    # Word 4
+        re8='(\\s+)'    # White Space 2
+        re9='((?:[A-Za-z0-9_]*))'   # Variable Name 1
 
         rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9,re.IGNORECASE|re.DOTALL)
         m = rg.search(txt)
@@ -402,9 +402,9 @@ def handleShowBondingList(lines):
         
         """
         bondings = []
-        re1='(\\d+)'	# Integer Number 1
-        re2='.*?'	# Non-greedy match on filler
-        re3='(acti)'	# Word 1
+        re1='(\\d+)'    # Integer Number 1
+        re2='.*?'   # Non-greedy match on filler
+        re3='(acti)'    # Word 1
 
         rg = re.compile(re1+re2+re3,re.IGNORECASE|re.DOTALL)
 
@@ -425,25 +425,25 @@ def handleShowStatsPolicerAll(lines):
         policer_stats = {}
         ps_item = {}
         
-        re1='(\\d+)'	# Integer Number 1
-        re2='(\\/)'	# Any Single Character 1
-        re3='(\\d+)'	# Uninteresting: int
-        re4='.*?'	# Non-greedy match on filler
-        re5='(\\d+)'	# Integer Number 2
-        re6='.*?'	# Non-greedy match on filler
-        re7='(days)'	# Variable Name 1
-        re8='.*?'	# Non-greedy match on filler
-        re9='(\\d+)'	# Integer Number 4
-        re10='(:)'	# Any Single Character 2
-        re11='(\\d+)'	# Integer Number 5
-        re12='(:)'	# Any Single Character 3
-        re13='(\\d+)'	# Integer Number 6
-        re14='.*?'	# Non-greedy match on filler
-        re15='(\\d+)'	# Integer Number 7
-        re16='.*?'	# Non-greedy match on filler
-        re17='(\\d+)'	# Integer Number 8
-        re18='.*?'	# Non-greedy match on filler
-        re19='(\\d+)'	# Integer Number 9       
+        re1='(\\d+)'    # Integer Number 1
+        re2='(\\/)' # Any Single Character 1
+        re3='(\\d+)'    # Uninteresting: int
+        re4='.*?'   # Non-greedy match on filler
+        re5='(\\d+)'    # Integer Number 2
+        re6='.*?'   # Non-greedy match on filler
+        re7='(days)'    # Variable Name 1
+        re8='.*?'   # Non-greedy match on filler
+        re9='(\\d+)'    # Integer Number 4
+        re10='(:)'  # Any Single Character 2
+        re11='(\\d+)'   # Integer Number 5
+        re12='(:)'  # Any Single Character 3
+        re13='(\\d+)'   # Integer Number 6
+        re14='.*?'  # Non-greedy match on filler
+        re15='(\\d+)'   # Integer Number 7
+        re16='.*?'  # Non-greedy match on filler
+        re17='(\\d+)'   # Integer Number 8
+        re18='.*?'  # Non-greedy match on filler
+        re19='(\\d+)'   # Integer Number 9       
         rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11+re12+re13+re14+re15+re16+re17+re18+re19,re.IGNORECASE|re.DOTALL)
 
         for line in lines:
@@ -468,30 +468,31 @@ def handleShowPolicerMappingAll(lines):
 
         """
         policerMapping = {}
-        re1='(\\d+)'	# Integer Number 1
-        re2='.*?'	# Non-greedy match on filler
-        re3='(\\d+)'	# Integer Number 2
-        re4='.*?'	# Non-greedy match on filler
-        re5='(\\d+)'	# Integer Number 3
-        re6='( )'	# White Space 1
-        re7='(\\()'	# Any Single Character 1
-        re8='((?:[A-Za-z0-9_]*))'	# Variable Name 1
-        re9='(\\))'	# Any Single Character 2
-        re10='.*?'	# Non-greedy match on filler
-        re11='(\\d+)'	# Integer Number 4
+        re1='(\\d+)'    # Integer Number 1
+        re2='.*?'   # Non-greedy match on filler
+        re3='(\\d+)'    # Integer Number 2
+        re4='.*?'   # Non-greedy match on filler
+        re5='(\\d+)'    # Integer Number 3
+        re6='( )'   # White Space 1
+        re7='(\\()' # Any Single Character 1
+        re8='((?:[A-Za-z0-9_]*))'   # Variable Name 1
+        re9='(\\))' # Any Single Character 2
+        re10='.*?'  # Non-greedy match on filler
+        re11='(\\d+)'   # Integer Number 4
 
         rg = re.compile(re1+re2+re3+re4+re5+re6+re7+re8+re9+re10+re11,re.IGNORECASE|re.DOTALL)
         for txt in lines:
-                if txt:
-                        m = rg.search(txt)
-                        if m:
-                            int1=m.group(1)
-                            uni=m.group(2)
-                            evc=m.group(3)
-                            ws1=m.group(4)
-                            c1=m.group(5)
-                            var1=m.group(6)
-                            c2=m.group(7)
-                            policerId=m.group(8)
-                            policerMapping[policerId] = (uni,evc)
-                            return policerMapping
+            if txt:
+                m = rg.search(txt)
+                if m:
+                    int1=m.group(1)
+                    uni=m.group(2)
+                    evc=m.group(3)
+                    ws1=m.group(4)
+                    c1=m.group(5)
+                    var1=m.group(6)
+                    c2=m.group(7)
+                    policerId=m.group(8)
+                    policerMapping[(uni,evc)] = policerId
+                    #logging.info(policerMapping)
+                    return policerMapping

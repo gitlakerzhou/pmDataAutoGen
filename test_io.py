@@ -14,6 +14,7 @@ class TestIO(object):
         self.logEnable = False
         #self.metrics_entry = {}
         self.output_list = []
+        self.bwOutput_list = []
 
     def dateStr(self):
         dt = datetime.datetime.now()
@@ -35,8 +36,10 @@ class TestIO(object):
             self.logEnable = True
         for e in data["CFM output"]:
             self.output_list.append(e)
+        for bw in data["BW output"]:
+            self.bwOutput_list.append(bw)
         logging.info("output format: " + ','.join(self.output_list))
-		
+        
 
     def checkEnvironment(self):
         if not os.path.exists(self.rootDir):
@@ -61,8 +64,8 @@ class TestIO(object):
             os.makedirs(self.rootDir +'/' + ip)
         if not os.path.exists(self.rootDir +'/' + ip + '/' + cpe):
             os.makedirs(self.rootDir +'/' + ip + '/' + cpe)
-        files["latest"] = open(self.rootDir +'/' + ip + '/' + cpe + '/cfmreprot', 'w+')
-        files["daily"]  = open(self.rootDir +'/' + ip + '/' + cpe + '/reprot_' + self.dateStr(), 'a+')
+        files["latest"] = open(self.rootDir +'/' + ip + '/' + cpe + '/cfmreport', 'w+')
+        #files["daily"]  = open(self.rootDir +'/' + ip + '/' + cpe + '/report_' + self.dateStr(), 'a+')
         return files
 
     def createReports(self, **testMetrics):
@@ -81,10 +84,38 @@ class TestIO(object):
         #write the metircs to both latest report and daily report
         files['latest'].write(line)
         files['latest'].close()
-        files['daily'].write(line)
-        files['daily'].close()
+        #files['daily'].write(line)
+        #files['daily'].close()
         #close the file and error handling
 
+    def reportBWFiles(self, ip, cpe):
+        files = {}
+        if not os.path.exists(self.rootDir +'/' + ip):
+            print('creating rootDir' + self.rootDir)
+            os.makedirs(self.rootDir +'/' + ip)
+        if not os.path.exists(self.rootDir +'/' + ip + '/' + cpe):
+            os.makedirs(self.rootDir +'/' + ip + '/' + cpe)
+        files["bwr"] = open(self.rootDir +'/' + ip + '/' + cpe + '/bandwidth', 'w+')
+        #files["daily"]  = open(self.rootDir +'/' + ip + '/' + cpe + '/report_' + self.dateStr(), 'a+')
+        return files
+
+    def createBWReports(self, **testMetrics):
+        #open the report files
+        files = self.reportBWFiles(testMetrics['ip'], testMetrics['cpe'])
+
+        #build the line:
+        line = ''
+        for entry in self.bwOutput_list:
+            if entry in testMetrics:
+                line = line + str(testMetrics[entry]) + ','
+            else:
+                logging.info('bw measurement ' + entry + 'does not exist!')
+        line = line[:-1] + '\n'
+
+        #write the metircs to both latest report and daily report
+        files["bwr"].write(line)
+        files["bwr"].close()
+        #close the file and error handling
 
 
 
